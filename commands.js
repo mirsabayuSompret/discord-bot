@@ -23,6 +23,7 @@ async function HasGuildCommand(appId, guildId, command) {
         console.log(`Installing "${command['name']}"`);
         InstallGuildCommand(appId, guildId, command);
       } else {
+        
         console.log(`"${command['name']}" command already installed`);
       }
     }
@@ -34,7 +35,7 @@ async function HasGuildCommand(appId, guildId, command) {
 // Installs a command
 export async function InstallGuildCommand(appId, guildId, command) {
   // API endpoint to get and post guild commands
-  const endpoint = `applications/${appId}/guilds/${guildId}/commands`;
+  const endpoint = `applications/${appId}/guilds/${guildId}/commands`
   // install command
   try {
     await DiscordRequest(endpoint, { method: 'POST', body: command });
@@ -42,6 +43,19 @@ export async function InstallGuildCommand(appId, guildId, command) {
     console.error(err);
   }
 }
+
+// Installs a command
+export async function PatchGuildCommand(appId, guildId, command) {
+  // API endpoint to get and post guild commands
+  const endpoint = `applications/${appId}/guilds/${guildId}/commands/${command['id']}`;
+  // install command
+  try {
+    await DiscordRequest(endpoint, { method: 'PATCH', body: command });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 
 // Get the game choices from game.js
 function createCommandChoices() {
@@ -59,24 +73,22 @@ function createCommandChoices() {
 }
 
 // Simple test command
-export const TEST_COMMAND = {
-  name: 'test',
-  description: 'Basic guild command',
+export const HELP_COMMAND = {
+  name: 'help',
+  description: 'show the list of command on this bot',
   type: 1,
 };
 
-// Command containing options
-export const CHALLENGE_COMMAND = {
-  name: 'challenge',
-  description: 'Challenge to a match of rock paper scissors',
-  options: [
-    {
-      type: 3,
-      name: 'object',
-      description: 'Pick your object',
-      required: true,
-      choices: createCommandChoices(),
-    },
-  ],
-  type: 1,
+export const LILY_COMMAND = {
+  name : "lily",
+  description : "ask lily anything",
+  type:1,
+}
+
+// build command
+export const BUILD_COMMAND = {
+  name: 'build',
+  description : 'build comamnd for petit island',
+  type:1,
 };
+

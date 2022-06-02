@@ -10,11 +10,12 @@ import {
 import { VerifyDiscordRequest, getRandomEmoji, DiscordRequest } from './utils.js';
 import { getShuffledOptions, getResult } from './game.js';
 import {
-  CHALLENGE_COMMAND,
-  TEST_COMMAND,
+  BUILD_COMMAND,
   HasGuildCommands,
+  HELP_COMMAND,
+  LILY_COMMAND,
 } from './commands.js';
-
+import axios from 'axios';
 // Create an express app
 const app = express();
 // Get port, or default to 3000
@@ -46,50 +47,56 @@ app.post('/interactions', async function (req, res) {
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
 
-    // "test" guild command
-    if (name === 'test') {
-      // Send a message into the channel where command was triggered from
+    if(name === 'help'){
+    
       return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          // Fetches a random emoji to send from a helper function
-          content: 'hello world ' + getRandomEmoji(),
-        },
-      });
+        type:InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data:{
+          content: 'build :to build the game\n\n lily : ask lily what shes doin'
+
+        }
+      })
     }
-    // "challenge" guild command
-    if (name === 'challenge' && id) {
-      const userId = req.body.member.user.id;
-      // User's object choice
-      const objectName = req.body.data.options[0].value;
 
-      // Create active game using message ID as the game ID
-      activeGames[id] = {
-        id: userId,
-        objectName,
-      };
-
+    if(name === 'lily'){
+    
+      var rand = ['whoooo', ' i want to conquer the world ahhaha', 'MY PHONE MY PHOOOONNEEEE','do you want to know a secret? i am cat :D'];
+      var randTextPic = Math.round(Math.random() * rand.length);
+      var text = rand[randTextPic];
+      console.log(randTextPic);
       return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          // Fetches a random emoji to send from a helper function
-          content: `Rock papers scissors challenge from <@${userId}>`,
-          components: [
-            {
-              type: MessageComponentTypes.ACTION_ROW,
-              components: [
-                {
-                  type: MessageComponentTypes.BUTTON,
-                  // Append the game ID to use later on
-                  custom_id: `accept_button_${req.body.id}`,
-                  label: 'Accept',
-                  style: ButtonStyleTypes.PRIMARY,
-                },
-              ],
-            },
-          ],
-        },
+        type:InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data:{
+          content: `what are you doing lily?\n\n${text}`,
+        }
       });
+
+    }
+
+
+
+    if(name === 'build'){
+     
+      try{
+        axios.get('http://xeloadmin:11c9bd7f762c08d9e5ae8590da0c045294@localhost:8080/job/xelo_build/build?token=xelo123')
+        .then(resp =>{
+          console.log(resp);
+          return res.send({
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            data: {
+              // Fetches a random emoji to send from a helper function
+              content: 'hello petit island we are now building your game :D',
+            },
+          });
+        }).catch(error =>{
+          console.log(error);
+        });
+      }catch(err){
+        console.error(err);
+      }
+
+      
+      
     }
   }
 
@@ -180,7 +187,8 @@ app.listen(PORT, () => {
 
   // Check if guild commands from commands.json are installed (if not, install them)
   HasGuildCommands(process.env.APP_ID, process.env.GUILD_ID, [
-    TEST_COMMAND,
-    CHALLENGE_COMMAND,
+    BUILD_COMMAND,
+    HELP_COMMAND,
+    LILY_COMMAND,
   ]);
 });
